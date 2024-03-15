@@ -1,0 +1,17 @@
+{
+  "name": "thebackenddev",
+  "version": "1.0.0",
+  "description": "This is my gateway to the BackEnd Dev world",
+  "type":"module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+      "dev":"modemon src/index.js"
+  },
+  "keywords": [
+    "JavaScript",
+    "BackEnd"
+  ],
+  "author": "Nishant Kumar",
+  "license": "ISC"
+}

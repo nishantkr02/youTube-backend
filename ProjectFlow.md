@@ -8,8 +8,8 @@
 
 ## Create the folders  : 
 controllers
- db
- middlewares
-   models
-    routes
-     utils 
+db
+middlewares
+models
+routes
+utils 

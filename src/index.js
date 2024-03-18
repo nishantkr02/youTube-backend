@@ -1,10 +1,13 @@
 // require ('dotenv').config({path:'./env'}) :: This breaks the consistency.
 import dotenv from "dotenv"
  import dbConnect from "./db/dbConnect.js"
- 
+ import {app} from './app.js'
 
  dotenv.config({path:'./env'})
 
+
+
+ 
  // => DB Connection ::: M-1 :::::::::::::: Totally Fine but makes index.js a bit messy 
 /*  ;(async ()=>{
     try{ 
@@ -37,7 +40,25 @@ import express from "express";
   const app  = express() 
  */
 
- //=> DB Connection ::: M-2 ::::::::::::: Import the separately written function and execute it .
+
+
+
+
+
+
+ //=> DB Connection ::: M-2 :::::::  Import the separately written function and execute it .
 
  dbConnect()
+ .then(()=>{
+   app.on("error",(error)=>{
+      console.log("DataBase Error Occured :",error);
+      throw error ;
+   })
+   app.listen(process.env.PORT || 8000,()=>{
+      console.log("Server is listening to the port :",process.env.PORT)
+   })
+ })
+ .catch((error)=>{
+   console.log("MongoDb connection Failed ::: ",error);
+ })
 

@@ -31,6 +31,20 @@ app.use(cookieParser());
 
 
 
+//----------------- Routes ------------------------------
+//importing router :: 
+ import userRouter from "./routes/user.routes.js";
+
+//routes Declaration  :: 
+//Intially we used  to implement the routes using  the ,app.get()  , but now => Cozz we were writing the app ,the routes and the controller at the same place .But Now Since now we have moved the things to a separate files , so we have to write it as a middleware , using app.use() ;
+
+// app.use() --> Router -->> controller
+app.use("/api/v1/users",userRouter);
+
+// here whatever route is given will work as prefix and when it  will go to the  router file , that will be the actual name of the path   , like here for this
+// e.g: http://localhost:8000//api/v1/users/register
+
+// Here we can write multiple routes on top of the user prefix , those all will be written in the user.routes file .So hence it will make the file less clumsy .
 
 
 

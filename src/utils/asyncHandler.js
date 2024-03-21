@@ -1,7 +1,8 @@
 
-
+//taking a function and returaning a function as well 
 const asyncHandler = (requestHandler)=>{
-  (req,res,next)=>{
+  
+   return (req,res,next)=>{
     Promise.resolve(requestHandler(req,res,next)).
     catch((err)=>next(err))
   }
@@ -11,9 +12,7 @@ const asyncHandler = (requestHandler)=>{
 export {asyncHandler}
 
 
-/* imagine this , here we are passing a function to the function itself 
- const asyncHandler = async ()=>{}
- const asyncHandler =(fn) =>{async ()=>{}} 
+/*
 
 
 

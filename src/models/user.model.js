@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
         trim:true,
         index:true 
     },
-    avtar:{
+    avatar:{
         type :String , //cloudinary url 
         required :true ,
     },
@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
     ],
     password:{
         type:String,
-        required :[true ,'Passwrod is required'] ,
+        required :[true ,'Password is required'] ,
     },
     refreshToken:{
         type:String ,

@@ -15,14 +15,22 @@ cloudinary.config({
             resource_type:"auto"
         })
 
-        //Now the file has been uploaded 
-        console.log('File is uploaded on Cloudinary ',response.url) ;
+        //Now the file has been uploaded ::: Let's do some testing 
+       // console.log('File is uploaded on Cloudinary ',response.url) ;
+        //console.log("The response From Cloudinary Aster Uploading  ::" , response);
+
+        //So now unlinking the file  :: Date 23/03 => THis is after the initial testing  : Sucessfully upload hone ke baad hanrae local storage se remove hoga , matlab ki hamare Public/test folder se 
+            fs.unlinkSync(localFilePath)
+
+
+
         //returning the whole response on uploading 
         return response ;
 
     }catch(error){
         ///if the file is malecious 
-        fs.unlinkSync(localFilePath) //Removes the locally saved temporary file as the opeartion got failed ;
+        fs.unlinkSync(localFilePath) 
+        //Removes the locally saved temporary file as the opeartion got failed ;
 
         return null ;
 

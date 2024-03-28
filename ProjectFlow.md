@@ -16,20 +16,29 @@ utils
 
 
 ## Controller Logic building ::
+
 >> registeUser ::: 
 
->input data ko process karenge  : get User detials form the frontend 
+->>input data ko process karenge  : get User detials form the frontend 
 
->> Thora validation karenge , ki thik se desired data diya hai ki nai :E.g ::
+->> Thora validation karenge , ki thik se desired data diya hai ki nai :E.g ::
 empty and all , user already exist or not : By using  email and username , files send hua hai ki nai , like files and all . 
->  Store karenge us data ko cloudinary pe ,check karenge data thik se aaya hai ki nai  avtar and all .
->> Create user Object : Create entry in the DB .
->> Remove passeord and refresh token feild from response  while sending .
->> check from creation , user bana ki nai 
->> return res
+->  Store karenge us data ko cloudinary pe ,check karenge data thik se aaya hai ki nai  avtar and all .
+-->> Create user Object : Create entry in the DB .
+-->> Remove passeord and refresh token feild from response  while sending .
+-->> check from creation , user bana ki nai 
+-->> return res
 
 
-## The user Modedel which we created earlier , can be used to talk to the database directlt . It will call the database to check diferenct thgings and many other task 
+## The user Model which we created earlier , can be used to talk to the database directly . It will call the database to check diferenct things and many other task 
+
+
+
+
+
+
+
+
 
  ## using the PostMan for backEnd  :;:::
   >> Body Tag >>  select form-data >> add key value pairs 
@@ -166,3 +175,37 @@ Data Stores in Req.files  ::  [Object: null prototype] {
     }
   ]
 }
+
+
+
+
+## Why do we need 2 Tokens  ::Access and Refresh Token :: >>> 
+Access Token :Short Lived 
+> We will able to use the all features till we have the access token  .
+
+ Refresh Token  : Long Lived 
+> When to provide new access token to the user , it helps us to manage the access token  .
+In real life , A refresh token just helps you re-validate a user without them having to re-enter their login credentials multiple times
+
+
+>> New Controller  :: loginUser >>
+ Logic :
+ -> Get the data from the req.body ()
+ -> Data verification : if the username or email is provided 
+ -> Find the user 
+ -> Verify password
+ -> Generate Tokens  : Acess and Refresh Token 
+ -> Send them back as Cookies 
+ -> Resoponse 
+
+
+## User and user ka difference  ???
+> User => 
+   MongoDb ka Mongoose ka ek object hai ,Mongoose ka methods iske through acess karna hai 
+ > user => 
+ ye intance hai database wale User ka , jo humne waps liya hai waha se .Aur mere banaye hue sare methods and fucntion humne apne user pe banay hai , joki instance hai hamara uss database wale  User ka  .
+
+ >> New Controller  :: LogOut >>
+  How  ?? :: clear cookie , and clear out the tokens .
+
+ > cookie is a two way feild , both request and response also has the access 

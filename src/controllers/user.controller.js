@@ -4,6 +4,26 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinaryFileUpload.js";
  import { ApiResponse } from "../utils/ApiResponseHandler.js";
 
+//Method To generate Access and Refresh Tokens ::
+ const generateTokens = async (userId)=>{
+  try{
+      const user = await User.findById(userId)
+     const accessToken = user.generateAccessToken()
+     const refreshToken = user.generateRefreshToken()
+
+     user.refreshToken=refreshToken ; //Adding value to user object
+     await user.save({ValiditeBeforeSave:false}); //This is from mongoDb
+     return {accessToken,refreshToken};
+
+     
+  }catch(error){
+      throw new ApiError(500," Something Went Wrong While Generating the Refresh and Access Tokens " )
+  }
+ }
+
+
+
+  
 const registerUser =  asyncHandler(async (req,res)=>{
     
         // The controller Logic  ::
@@ -83,4 +103,61 @@ const registerUser =  asyncHandler(async (req,res)=>{
     })
 
 
-export {registerUser};
+const loginUser = asyncHandler(async (req,res)=>{
+  //step 1: Fetch Data from requet body 
+  const [username,email,password]=req.body ;
+
+  //step 2 : Verification of the data 
+  if(!username && ! email)
+  throw new ApiError(400,"Username or Email and password  is required !!")
+
+  //Step 3 : Finding the user  : On the basis of username or email 
+ const user = User.findOne({
+    $or:[{ username }, { email }]
+  })
+
+  if(!user){
+    throw new ApiError(404, "User Does Not Exist ..!!")
+  }
+
+//Step 4 : checking the password is correct or not  
+ const isPasswordValid = await user.isPasswordCorrect(password)
+ if(!isPasswordValid){
+  throw new ApiError(401, "Invalid User Credentials ...!!")
+}
+//Step 5 : Generating the Tokens  :: //using the method that I wrote earlier 
+ const {accessToken,refreshToken}=await generateTokens(user._id)
+
+//  Udating the user feild and hiding some data before giving out the response .
+const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+
+
+// Sending Cookies :
+const options = {
+  httpOnly :true ,
+  secure :true 
+}
+
+
+//returning the final response  response
+return res
+ .status(200)
+ .cookie("accessToken",accessToken,options)
+ .cookie("refreshToken",refreshToken,options)
+ .json(
+  new ApiResponse(
+    200,
+    {
+      //This is the case when the user himself wantto save the tokens for himself 
+    user : loggedInUser,accessToken,refreshToken
+    },
+    "User Logged In SuccesFully "
+  )
+ )
+
+})
+
+export {
+  registerUser ,
+  loginUser ,
+};

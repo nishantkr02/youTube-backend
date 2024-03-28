@@ -64,7 +64,7 @@ const userSchema = new mongoose.Schema({
 
 // method  checking if the password entered is true or not .
 userSchema.methods.isPasswordCorrect = async function(password){
-       // return await bcrypt.compare(providedData , encryptedData) //true/false
+    //bcrypt.compare(newly providedData , saved encryptedData) 
        return await  bcrypt.compare(password, this.password) 
 }
 

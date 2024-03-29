@@ -209,3 +209,16 @@ In real life , A refresh token just helps you re-validate a user without them ha
   How  ?? :: clear cookie , and clear out the tokens .
 
  > cookie is a two way feild , both request and response also has the access 
+
+
+ >> New Controller :: refreshAccessToken
+ use of tokens  : User ko baar baar login na karne pare .
+
+ access token is short lived ., but the refresh Token is stored in the database .
+ > session storage or refreshToken : so suppose our access session has expired and we got the 401 request ,then instead of asking user to login again, what we can do is , we can hit an endpoint and ask the user to refresh the access token .
+
+ How Will they refresh and get the new token   ??
+ In that request we will send the refresh token with it, then it will match the refresh token with the database , if it matches , we will provide a new  acessToken .
+
+
+

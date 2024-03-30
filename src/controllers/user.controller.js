@@ -5,7 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinaryFileUpload.js";
  import { ApiResponse } from "../utils/ApiResponseHandler.js";
  import jwt  from "jsonwebtoken";
  
-//Method To generate Access and Refresh Tokens ::
+//Helper Function : To generate Access and Refresh Tokens ::
  const generateTokens = async (userId)=>{
   try{
       const user = await User.findById(userId)
@@ -26,7 +26,7 @@ import { uploadOnCloudinary } from "../utils/cloudinaryFileUpload.js";
 
 
 
- // Registering New User  Controller Function :::: 
+ // Controller Function : Registering New User :: 
 const registerUser =  asyncHandler(async (req,res)=>{
     
         // The controller Logic  ::
@@ -105,7 +105,7 @@ const registerUser =  asyncHandler(async (req,res)=>{
 
     })
 
-//Logging in the the user Controller Function  ::
+//Controller Function : Logging in  the user ::>
 const loginUser = asyncHandler(async (req,res)=>{
   //step 1: Fetch Data from requet body 
   const {username,email,password}=req.body ;
@@ -160,7 +160,7 @@ return res
 
 })
 
-// Logging Out Controller Function:::
+// Controller Function :Logging Out Controller Function:::
  const logoutUser = asyncHandler(async (req,res)=>{
     await User.findByIdAndUpdate(
     //find by this
@@ -189,7 +189,7 @@ return res
     .json(new ApiResponse(200,{},"User Logged OUt !"))
  })
 
-// To refresh the access Token Controller Function :::>> 
+// Controller Function :To refresh the access Token ::>> 
  const refreshAccessToken = asyncHandler(async (req,res)=>{
 
    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken 
@@ -247,11 +247,155 @@ catch (error) {
    
  })
 
+//Controller Function : To change  the current password
+const changeCurrentPassword = asyncHandler(async(req,res)=>{
+    const {oldPassword , newPassword}= req.body ;
+
+    /* There might be the case when we ask the user to reenter the password 
+    const {oldPassword , newPassword,confirmNewPassword}= req.body ;
+    if(!(newPassword===confirmNewPassword)){
+      throw new ApiError(400,"Password doen't match ")
+    }
+    */
+
+
+    const userId = req.user?._id ;
+    const user = await User.findById(userId)
+
+    const isPasswordCorrect= await user.isPasswordCorrect(oldPassword)
+    if(!isPasswordCorrect){
+      throw new ApiError(400,"Invalid Password");
+    }
+    //assignig new password to user feild and saving it to the db also .
+    user.password= newPassword ;
+       await user.save({validateBeforeSave:false})
+
+
+    return res
+       .status(200)
+       .json(new ApiResponse(200,{},"Password Changed Successfully "))
+
+})
+
+// Controller Function : To get the current user if the user is loggged in  :::>>
+const getCurrentUser = asyncHandler(async(req,res)=>{
+  //Note  : While hitting this endpoint , we will use the authMiddleware , which puts the whole user in the request body .
+  return res
+  .status(200)
+  .json(new ApiResponse(200,req.user,'Current user fetched Successfully'))
+})
+
+
+
+// Controller Function : To Update the User Account Info ::
+const updateAccountDetails = asyncHandler(async(req,res)=>{
+
+// Note : We can decide which feilds we are allowing the users to update , in case of files , we shold make a separate controller function for them , so here we are updating only the text feilds .
+
+  const {fullName,email}= req.body
+  if(!fullName && !email){
+    throw new ApiError(400 , "All Feilds are required ")
+  }
+
+  const userId=req.user?._id
+  const user = User.findByIdAndUpdate
+  (  
+    userId,
+    {
+      $set:{
+        fullName:fullName,
+        email:email
+      }
+     },
+     { new:true} // updated info in returned 
+
+  ).select("-password") //removing the password before returning to the user 
+
+  return res.status(200)
+  .json(new ApiResponse(200,user,"User account details updated"))
+
+
+})
+
+// Controller Function : To Update the Avatar Image ::>>
+const updateAvatar = asyncHandler(async(req,res)=>
+{
+   const avatarLocalPath= req.file?.path
+  if(!avatarLocalPath){
+    throw new ApiError(400,"Avatar file is missing ")
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  if(!avatar.url){
+    throw new ApiError(400,"Error While Uploading the Avtar on Cloudinary ")
+  }
+
+  const userId= req.user?._id
+ const user= await User.findByIdAndUpdate
+  ( userId ,
+    {
+       $set :{
+         avatar:avatar.url,
+         }
+    },
+    {new:true}
+
+  ).select("-password")
+
+  return res.status(200)
+  .json(new ApiResponse(200,user,"Avtar image changed SuccessFully"))
+
+})
+
+// Controller Function : To Update the Cover Image ::>>
+const updateCoverImage = asyncHandler(async(req,res)=>
+{
+   const coverLocalPath= req.file?.path
+  if(!coverLocalPath){
+    throw new ApiError(400,"Cover Image file is missing ")
+  }
+
+  const coverImage = await uploadOnCloudinary(coverLocalPath);
+  if(!coverImage.url){
+    throw new ApiError(400,"Error While Uploading the Cover File on Cloudinary ")
+  }
+
+  const userId= req.user?._id
+ const user= await User.findByIdAndUpdate
+  ( userId ,
+    {
+       $set :{
+        coverImage:coverImage.url,
+         }
+    },
+    {new:true}
+
+  ).select("-password")
+
+  return res.status(200)
+  .json(new ApiResponse(200,user,"Cover image changed SuccessFully"))
+
+})
+
+
+
+
+
+
+
+
+
+
 
 
 export {
   registerUser ,
   loginUser ,
   logoutUser ,
-  refreshAccessToken
+  refreshAccessToken,
+  changeCurrentPassword,
+  getCurrentUser ,
+  updateAccountDetails,
+  updateAvatar,
+  updateCoverImage
 };

@@ -98,6 +98,8 @@ empty and all , user already exist or not : By using  email and username , files
   password: 'hitherewhy'
 }
  ## response from the clodinary ::::::::::::
+   >const coverImage= await uploadOnCloudinary(coverLocalPath) ;
+   >console.log(coverImage);
 
  The response From Cloudinary Aster Uploading  ::
   {
@@ -122,7 +124,10 @@ empty and all , user already exist or not : By using  email and username , files
   original_filename: 'harkirat',
   api_key: '379259554124669'
 }
-The response From Cloudinary Aster Uploading  :: 
+
+## The response From Cloudinary Aster Uploading  :: 
+ >const avatar = await uploadOnCloudinary(avatarLocalPath) ;
+ >console.log(avtar)
 {
   asset_id: 'dea7484265809f75ead28b6a484e6edd',
   public_id: 'd3qkwlcmvd0c6n6cnule',
@@ -149,6 +154,8 @@ The response From Cloudinary Aster Uploading  ::
 
 
 ## Data stored in req.fiels  ::::
+> console.log("Data Stores in Req.files  :: ",req.files) ;
+
 Data Stores in Req.files  ::  [Object: null prototype] {
   avatar: [
     {

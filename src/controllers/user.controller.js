@@ -298,7 +298,7 @@ const updateAccountDetails = asyncHandler(async(req,res)=>{
   }
 
   const userId=req.user?._id
-  const user = User.findByIdAndUpdate
+  const user =await  User.findByIdAndUpdate
   (  
     userId,
     {
@@ -377,14 +377,94 @@ const updateCoverImage = asyncHandler(async(req,res)=>
 
 })
 
+// Controller Function : To get all the info of a user :
+const getUserChannelProfile=asyncHandler(async (req,res)=>{
+  const {username}=req.params
+  if(!username?.trim()){
+    throw new ApiError(400,"Username is missing");
+  }
 
+ const channelInfo  = await User.aggregate(
+  [
 
+  {
+    $match:{
+      username:username?.toLowerCase()
+    },
+    
+  },
+   //Finding the number of subscriber a channel/user have 
+  {
+    $lookup:{
+      from:"subscriptions",
+      localField:"_id",
 
+      //We will look for the docs for which channel name has been present , then these dosc will  gives us the number of docs/ users subscribed to that channel .
+      foreignField:"channel",
+      as:"subscribers"
+      
+    }
+  },
 
+  //Finding the number of channels/user a user subscribedTo
+  {
+    $lookup:{
+      //kis docs se karna hai 
+      from:"subscriptions",
+      localField:"_id",
 
+      //We will look for the docs for which a channel has that user name as a subscriber 
+      foreignField:"subscriber",
+      as:"subscribedTo"
+      
+    }
+  },
+  //adding the data and putting in the final
+  {
+    $addFields :{
+      subcriberCount :{
+        $size :"$subscriber"
+      },
+      subscribedToCount :{
+        $size :"$subscribedTo"
+      },
 
+      //kisi channel/user ke subscribers ki list me hai hu ki nai 
+      isSubscribed:{
+        $cond:{
+          if:{$in:[req.user?._id,"$subscribers.subscriber"]},
+          then:true,
+          else:false
+        }
+      }
+    }
+  },
 
+  //Project : Giving out the selected things 
+  {
+    $project :{
+      fullName:1,
+      username :1,
+      subcriberCount:1,
+      subscribedToCount:1,
+      isSubscribed:1,
+      avatar:1,
+      coverImage:1,
+      email:1
+    }
+  }
+  
+])
 
+if(!channelInfo?.length){
+  throw new ApiError(404,"Channel does not Exist")
+}
+
+return res
+.status(200)
+.json(new ApiResponse(200,channelInfo[0],"Channel Info Fethced Successfully "))
+
+})
 
 
 
@@ -397,5 +477,6 @@ export {
   getCurrentUser ,
   updateAccountDetails,
   updateAvatar,
-  updateCoverImage
+  updateCoverImage ,
+  getUserChannelProfile
 };

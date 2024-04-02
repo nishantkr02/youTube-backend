@@ -229,3 +229,19 @@ In real life , A refresh token just helps you re-validate a user without them ha
 
 
 
+ >> New Controller :: refreshAccessToken , updateUserInfo , Update Cover Image and udpate Avatar 
+
+
+
+ ## ----------------------------------------------------------------------------------------------------------------------------------------------- ##
+
+ ## UnderStanding the Subscription Schema 
+  > Problem : When we open the profile of a user/channel on youtube  we can see his subscriber and the channel he  has subscribed ,
+  and the Subscribe Button name will be differebt for the users , who are subscribed and who aren't . So these are the things we have to keep in mind .
+  > Why can't we added a subscriber feild in the userSchema itself , and store the subscriberes as am array ..?
+  So we cannot simply add the values into an array , as the number of subscriber can be very high , then it will not be efficient, as we need to add or remove the subscriber from the list of users .
+
+  >> So we need a separate storage and schema for it ., and later we will join these two tables to access the data .
+
+=> Channel search se => Number of Subscriber for that channel  
+=> Subsciber search se  => Number of channel , to which that user has subscribed .

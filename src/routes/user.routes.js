@@ -1,5 +1,16 @@
 import { Router } from "express"
-import { loginUser, logoutUser, refreshAccessToken, registerUser } from "../controllers/user.controller.js"
+import { changeCurrentPassword,
+getCurrentUser,
+getUserChannelProfile,
+getWatchHistory,
+loginUser,
+logoutUser,
+refreshAccessToken,
+registerUser,
+updateAccountDetails,
+updateAvatar,
+updateCoverImage } from "../controllers/user.controller.js"
+
 import { upload } from "../middlewares/multer.middleware.js"
 import { User } from "../models/user.model.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
@@ -44,8 +55,35 @@ userRouter.route("/register").post
    //adding the middleware : 
    userRouter.route("/logout").post(verifyJWT,logoutUser)
 
-
    //refreshing the access token  ::
    userRouter.route("/refresh-token") .post(refreshAccessToken)
+
+    //changing the current password 
+   userRouter.route("/change-password").post(verifyJWT,changeCurrentPassword)
+
+    //
+    userRouter.route("/current-user").get(verifyJWT,getCurrentUser)
+
+    // Updating the account details
+    userRouter.route("/update-details")
+    .patch(verifyJWT,updateAccountDetails)
+
+    // Updating the avatar
+    userRouter.route("/update-avatar")
+    .patch(verifyJWT,upload.single("avatar"),updateAvatar) ;
+
+    // Updating the Cover Inage
+       userRouter.route("/update-cover-image")
+       .patch(verifyJWT,upload.single("coverImage"),updateCoverImage) ;
+
+    // Getting the channel profile info  : We are using the pramas here so this is different 
+    userRouter.route("/c/:username").get(verifyJWT,getUserChannelProfile) ;
+
+    // Get watch history
+    userRouter.route("/watch-History").get(verifyJWT,getWatchHistory)
+
+  
+
+
 
  export default userRouter

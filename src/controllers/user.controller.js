@@ -89,7 +89,7 @@ const registerUser =  asyncHandler(async (req,res)=>{
 //Step 8 : Checking the user  creation and removinge sensitive feilds 
     
      //removing sensitive data 
-   const createdUser=  await User.findById(user._id).select("-password -refreshToken ")
+  const createdUser=  await User.findById(user._id).select("-password -refreshToken ")
 
    if(!createdUser){
     throw new ApiError(500,"Something went wrong while registring the user ")
@@ -384,6 +384,7 @@ const getUserChannelProfile=asyncHandler(async (req,res)=>{
     throw new ApiError(400,"Username is missing");
   }
 
+  // aggregate([Array of operations],options) 
  const channelInfo  = await User.aggregate(
   [
 
@@ -394,7 +395,7 @@ const getUserChannelProfile=asyncHandler(async (req,res)=>{
     
   },
    //Finding the number of subscriber a channel/user have 
-  {
+  { // Lookup is doing the left outer join 
     $lookup:{
       from:"subscriptions",
       localField:"_id",
@@ -466,6 +467,72 @@ return res
 
 })
 
+// Controller Function : To get the watch History of a user 
+
+const getWatchHistory= asyncHandler(async(req,res)=>{
+
+      const user = await User.aggregate([
+        {
+          // finding the user 
+          $match:{
+            // here we created the object id in the format it is stored in the mongoDB
+            _id:new mongoose.Types.ObjectId(req.user._id)
+          }
+         } ,
+
+          // Going through the watch history of that user 
+          {
+            $lookup:{
+                from :"videos",
+                localField:"watchHistory",
+
+                //look at the data model for reference , these feilds are assigned based on that .
+                 foreignField:"_id",
+                 as:"watchHistory" ,
+
+
+                 // now We are inside the videos document and we are joing it with the users documents ,and  chaining on this lookup a new pipeline to get the details of the owner of the video 
+                 pipeline:[
+                  {
+                    $lookup :{
+                      from :"users",
+                      localField:"owner",
+                      foreignField:"_id",
+                      as:"owner",
+
+                      // Filtering out the information to store in  the owner , we don't need them all 
+                      pipeline:[
+                        {
+                          project :{
+                            fullName:1,
+                            username :1,
+                            avatar:1 ,
+
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  //Just to simplify the data stored in the array feild .,before sending out to the front end , sending the first data feild .
+                  {
+                    $addFields:{
+                      owner :{
+                        $first :"owner"
+                      }
+                    }
+                  }
+
+                 ] 
+
+            }
+          }
+      
+        ])
+        return res
+        .status(200)
+        .json(new ApiResponse(200,user[0].WatchHistory,"Watch History f3etched Successfully"))
+})
+// Note  : In the mongoDb , the _id is stored as a string like                         ObjectId("rwefwefwwfw34") , so sometimes we have to extract the id string for this, so the first match feild is to extract that id and match the user from it . But since we use mongoose , it works behind the scenes and gives us the directly the string .
 
 
 export {
@@ -478,5 +545,6 @@ export {
   updateAccountDetails,
   updateAvatar,
   updateCoverImage ,
-  getUserChannelProfile
+  getUserChannelProfile ,
+  getWatchHistory
 };

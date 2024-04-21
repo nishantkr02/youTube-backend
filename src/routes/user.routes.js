@@ -17,7 +17,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const userRouter = Router()
 
-//here before going to the register user part we are using this middleware Funtion to handle the file upload .
+//Registering the user and using the niddleware to handle the file upload  .
 
 userRouter.route("/register").post
 (
@@ -42,17 +42,16 @@ userRouter.route("/register").post
 
    But here, we need to accept files from different fields and in different numbers. Hence we use,
 
-  .field([{fieldName: String, maxCount: Int},])
+  .field([{fieldName: String, maxCount: Int},{},{}....])
    and pass an array of object(s) having the field name and number of files that can be uploaded using that field as an argument.
 
     */
 
-    //LOGIN ROUTE  ::
+    //Logging In the user   ::
    userRouter.route("/login").post(loginUser)
 
-   //SECURE ROUTE : userRouter.route("/logout").post(logoutUser)
 
-   //adding the middleware : 
+   //Logging out the user and adding the middleware : 
    userRouter.route("/logout").post(verifyJWT,logoutUser)
 
    //refreshing the access token  ::

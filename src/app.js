@@ -23,7 +23,7 @@ const app = express();
 // jab url me data jana hai , to usko kaise encoding hoga , jo convert karta hai url ko , to wo bhi express ko batana hota  hai ki waha se jab data aayega toh usko kaise handle karna hai .
 app.use(express.urlencoded({extended:true,limit:"16Kb"}))
 
-// Ye files ko handle karne ke liye hai ,kai baar humlog kuch files ko apn ehi server pe store rakhna chahte hain , toh uss case ye batane ke liye ha ki ek local folder hai public naam ka ,jisme ye sab storred hai 
+// Ye files ko handle karne ke liye hai ,kai baar humlog kuch files ko apne hi server pe store rakhna chahte hain , toh uss case ye batane ke liye ha ki ek local folder hai public naam ka ,jisme ye sab storred hai 
 app.use(express.static("public"))
 
 //Cookie-parser ::  Mai mere server se user ke browser ki jo cookie hai usko access kar paau aur usko set bhi kar paau ,i.e cookie ke upar CRUD operations 
@@ -36,15 +36,14 @@ app.use(cookieParser());
  import userRouter from "./routes/user.routes.js";
 
 //routes Declaration  :: 
-//Intially we used  to implement the routes using  the ,app.get()  , but now => Cozz we were writing the app ,the routes and the controller at the same place .But Now Since now we have moved the things to a separate files , so we have to write it as a middleware , using app.use() ;
+//Intially we used  to implement the routes using  the ,app.get()  , but now => Cozz we were writing the app and the routes and the controller at the same place .But Now Since now we have moved the things to a separate files , so we have to write it as a middleware , using app.use() ;
 
 // app.use() --> Router -->> controller
 app.use("/api/v1/users",userRouter);
 
-// here whatever route is given will work as prefix and when it  will go to the  router file , that will be the actual name of the path   , like here for this
-// e.g: http://localhost:8000//api/v1/users/register
-
-// Here we can write multiple routes on top of the user prefix , those all will be written in the user.routes file .So hence it will make the file less clumsy .
+/* Note  :  here whatever route is given will work as prefix and when it  will go to the  router file , that will be the actual name of the path   , like here for this
+ e.g: http://localhost:8000//api/v1/users/register
+ Here we can write multiple routes on top of the users prefix , those all will be written in the user.routes file .So hence it will make the file less clumsy in this app.js , just like we have routes for the user , we will have so many other routes for each and every model . */
 
 
 

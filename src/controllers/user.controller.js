@@ -31,7 +31,7 @@ const registerUser =  asyncHandler(async (req,res)=>{
     
         // The controller Logic  ::
 
- //Step 1 : Get the data from the user :  req.body() :  Jab form   se ,ya direct json  se aa raha ho data . Par url se bhi aa sakta hia  . 
+ //Step 1 : Get the data from the user :  req.body() :  Jab form   se ,ya direct json  se aa raha ho data . Par url se bhi aa sakta hia tab req.params hota hai  . 
     
         const {fullName , email, username ,password} = req.body
 

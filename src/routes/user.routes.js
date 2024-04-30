@@ -60,7 +60,7 @@ userRouter.route("/register").post
     //changing the current password 
    userRouter.route("/change-password").post(verifyJWT,changeCurrentPassword)
 
-    //
+    // Get the current user 
     userRouter.route("/current-user").get(verifyJWT,getCurrentUser)
 
     // Updating the account details

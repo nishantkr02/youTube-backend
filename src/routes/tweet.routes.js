@@ -1,9 +1,11 @@
 import { Router } from "express"
+import mongoose from "mongoose";
 import { createTweet,
     getUserTweets,
     updateTweet,
     deleteTweet
 } from "../controllers/tweet.controller.js" 
+
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const tweetRouter = Router() ;
@@ -15,10 +17,10 @@ tweetRouter.route("/new-tweet").post(verifyJWT,createTweet);
  tweetRouter.route("/all-tweets").get(verifyJWT,getUserTweets)
 
  //update a tweet
-  tweetRouter.route("/update-tweet").patch(verifyJWT,updateTweet)
+  tweetRouter.route("/update-tweet/:id").patch(verifyJWT,updateTweet)
 
   // delete a tweet 
-  tweetRouter.route("/delete-tweet").delete(verifyJWT,deleteTweet)
+  tweetRouter.route("/delete-tweet/:id").delete(verifyJWT,deleteTweet)
 
   export default tweetRouter 
 

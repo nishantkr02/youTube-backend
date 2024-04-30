@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinaryFileUpload.js";
  import { ApiResponse } from "../utils/ApiResponseHandler.js";
  import jwt  from "jsonwebtoken";
+ import mongoose from "mongoose";
  
 //Helper Function : To generate Access and Refresh Tokens ::
  const generateTokens = async (userId)=>{
@@ -53,6 +54,8 @@ const registerUser =  asyncHandler(async (req,res)=>{
          throw new ApiError(409,"User with this Username or Email Alredy Exist ..!!! ")
 
  //Step 4 : checking for the files : multer gives use req.files
+      const avatarLocalPath = req.files?.avatar[0]?.path ;
+
          let coverLocalPath ;
          if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length >0 )
          {
@@ -61,17 +64,18 @@ const registerUser =  asyncHandler(async (req,res)=>{
 
          console.log("Data Stores in Req.files  :: ",req.files) ;
 
-      const avatarLocalPath = req.files?.avatar[0]?.path ;
+     
       //avatar is a required Feild
+      console.log("Avtar ka data :" ,avatarLocalPath);
       if(!avatarLocalPath)
-      throw new ApiError(404,'Avatar Files is required');
+      throw new ApiError(404,' local patha aa raha ahi ki nai be ,, Avatar Files is required');
 
 // Step 5  :   Uploading on cloudinary : We have already written a Util for this     in  cloudinaryFileUpload.js
     const coverImage= await uploadOnCloudinary(coverLocalPath) ;
     const avatar = await uploadOnCloudinary(avatarLocalPath) ;
 //Step 6 : Checking the avtar files is uploaded or not 
     if(!avatar){
-      throw new ApiError(400,"Avatar File is Required");
+      throw new ApiError(400,"Avatar File is Required or Upload Failed");
     } 
 
 //Step 7 : Entry in the Database  : User Model will be used here , as it it the only one who is taliking to the database .
@@ -135,14 +139,14 @@ const loginUser = asyncHandler(async (req,res)=>{
 const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
 
-// Sending Cookies :
+// Adding options for Cookie
 const options = {
   httpOnly :true ,
   secure :true 
 }
 
 
-//returning the final response  response
+//Sending Cookies and returning the final response  response
 return res
  .status(200)
  .cookie("accessToken",accessToken,options)
@@ -263,8 +267,8 @@ const changeCurrentPassword = asyncHandler(async(req,res)=>{
     const userId = req.user?._id ;
     const user = await User.findById(userId)
 
-    const isPasswordCorrect= await user.isPasswordCorrect(oldPassword)
-    if(!isPasswordCorrect){
+    const isPasswordValid= await user.isPasswordCorrect(oldPassword)
+    if(!isPasswordValid){
       throw new ApiError(400,"Invalid Password");
     }
     //assignig new password to user feild and saving it to the db also .
@@ -425,7 +429,7 @@ const getUserChannelProfile=asyncHandler(async (req,res)=>{
   {
     $addFields :{
       subcriberCount :{
-        $size :"$subscriber"
+        $size :"$subscribers"
       },
       subscribedToCount :{
         $size :"$subscribedTo"
@@ -486,8 +490,6 @@ const getWatchHistory= asyncHandler(async(req,res)=>{
             $lookup:{
                 from :"videos",
                 localField:"watchHistory",
-
-                //look at the data model for reference , these feilds are assigned based on that .
                  foreignField:"_id",
                  as:"watchHistory" ,
 
@@ -518,7 +520,7 @@ const getWatchHistory= asyncHandler(async(req,res)=>{
                   {
                     $addFields:{
                       owner :{
-                        $first :"owner"
+                        $first :"$owner"
                       }
                     }
                   }
@@ -531,7 +533,7 @@ const getWatchHistory= asyncHandler(async(req,res)=>{
         ])
         return res
         .status(200)
-        .json(new ApiResponse(200,user[0].WatchHistory,"Watch History f3etched Successfully"))
+        .json(new ApiResponse(200,user[0].watchHistory,"Watch History f3etched Successfully"))
 })
 // Note  : In the mongoDb , the _id is stored as a string like                         ObjectId("rwefwefwwfw34") , so sometimes we have to extract the id string for this, so the first match feild is to extract that id and match the user from it . But since we use mongoose , it works behind the scenes and gives us the directly the string .
 

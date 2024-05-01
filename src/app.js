@@ -51,7 +51,9 @@ Note  :  here whatever route is given will work as prefix and when it  will go t
 import tweetRouter from "./routes/tweet.routes.js"
 app.use("/api/v1/tweets",tweetRouter) 
 
-
+ //Comment Route 
+ import commentRouter from "./routes/comment.routes.js";
+ app.use("/api/v1/comments",commentRouter)
 
 
 

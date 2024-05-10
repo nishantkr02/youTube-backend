@@ -1,15 +1,15 @@
 import mongoose from "mongoose"
 import {Comment} from "../models/comment.model.js"
-import {ApiError} from "../utils/ApiError.js"
-import {ApiResponse} from "../utils/ApiResponse.js"
+import {ApiError} from "../utils/ApiErrorHandler.js"
+import {ApiResponse} from "../utils/ApiResponseHandler.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import { Video } from "../models/video.model.js"
 
-//Getting all the comments on the video 
+//Controller function to : To get all the comments on the video 
 const getVideoComments = asyncHandler(async (req, res) => {
     //TODO: get all comments for a video
     const {videoId} = req.params
-    const {page = 1, limit = 10} = req.query
+    const {page = 1, limit} = req.query
 
     const commentList = await Video.aggregate ([
         {
@@ -17,13 +17,63 @@ const getVideoComments = asyncHandler(async (req, res) => {
                 _id:new mongoose.Types.ObjectId(videoId)
             }
         } ,
+        
+       /*   This part is not working 
+       {
+            $skip:Number((page-1)*limit)
+        },
+        {
+            $limit:2
+        }, */
 
         {
             $lookup:{
                 from:"comments",
-                localFeild:"_id",
+                localField:"_id",
                 foreignField:"video",
-                as :"AllComments"
+                as :"AllComments" ,
+
+                //Getting the likes details
+                pipeline:[
+                    {
+                        $lookup :{
+                            from:"likes" ,
+                            localField:"_id",
+                            foreignField:"comment",
+                            as:"likesList",
+                            
+                        },
+                        
+                    },
+                    {
+                    $addFields:{
+                        totalLikes:{
+                            $size:"$likesList"
+                        },
+            //This is i am not so sure of .!! 
+                        likedByCurrentUser:{
+                            $cond:{
+                                if:{$in:[req.user?._id,"$likesList.likedBy"]},
+                                then:true,
+                                else:false
+                            }
+                            }
+                    }
+                    } ,
+                    {
+                        $project:{
+                            owner:1,
+                            content:1,
+                            createdAt :1,
+                            totalLikes:1,
+                            likedByCurrentUser:1
+
+
+                        }
+                    }
+
+                ]
+
 
             }
         },
@@ -51,15 +101,10 @@ const getVideoComments = asyncHandler(async (req, res) => {
 $sort: onsomefield(s)here,
 $skip: Z*Y,
 $limit: Y, */
-        {
-            $skip:(page-1)*limit
-        },
-        {
-            $limit:limit
-        },
+        
 
     ])
-    if(!commentList)
+    if(!commentList?.length)
     throw new ApiError(400,"No comments found or unable to fetch Comments")
      
     return res.status(200).json(new ApiResponse(201,commentList,"Comments fetched Successfully"))
@@ -67,11 +112,16 @@ $limit: Y, */
 })
 
 
-//Adding a new commnet on the video 
+//Controller function to : Adding a new commnet on the video 
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a video
-    const {userId} = req.user?._id ;
-    const videoId = req.params 
+    const userId = req.user?._id ;
+    
+    const id = req.params.videoId
+    console.log("Id passed :",id);
+
+
+
     const {content} = req.body 
 
     if(!content)
@@ -79,7 +129,7 @@ const addComment = asyncHandler(async (req, res) => {
 
     const newComment = await Comment.create({
         content:content ,
-        video:videoId ,
+        video: new mongoose.Types.ObjectId(id),
         owner :userId
     })
 
@@ -91,11 +141,25 @@ const addComment = asyncHandler(async (req, res) => {
 })
 
 
-//Updating the new comment on the video
+// Controller function to : Updating the new comment on the video
 const updateComment = asyncHandler(async (req, res) => {
     // TODO: update a comment
     const {newContent} = req.body
-    const commentId = new mongoose.Types.ObjectId(req.params );
+    const commentId = new mongoose.Types.ObjectId(req.params.commentId );
+
+
+    const comment = await Comment.findById(commentId)
+    
+    if (!comment) {
+        throw new ApiError(404, "comment not found");
+    }
+
+    //checking if the Logged in user is the owner of the comment 
+    if (comment?.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(400, "Unauthorized..!! Only the owner of the comment can Edit this comment ..!!");
+    }
+
+
 
     const updatedComment = await Comment.findByIdAndUpdate(
         commentId,
@@ -113,15 +177,30 @@ const updateComment = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200,updatedComment,"Comment updated ..!!  "))
 })
 
+//Controller function to : Delete a tweet 
 const deleteComment = asyncHandler(async (req, res) => {
     // TODO: delete a comment
 
-    const commentId = new mongoose.Types.ObjectId(req.params );
+    const commentId = new mongoose.Types.ObjectId(req.params.commentId );
+
+    const comment = await Comment.findById(commentId)
+    //console .log("Comment to be deleted :",comment)
+
+    if (!comment) {
+        throw new ApiError(404, "comment not found");
+    }
+
+    //checking if the Logged in user is the owner of the comment 
+    if (comment?.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(400, "Unauthorized..!! Only the owner of the comment can Delete this comment ..!! ");
+    }
+
     const deletedComment = await Comment.findByIdAndDelete(commentId);
+    
     if(!deletedComment)
     throw new ApiError(400,"Unable to delete the comment ")
 
-    return res.status(200).json(new ApiResponse(201,{},"Comment Deleted ..!!"))
+    return res.status(200).json(new ApiResponse(201,deletedComment,"Comment Deleted ..!!"))
 
 })
 

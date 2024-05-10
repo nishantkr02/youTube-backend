@@ -22,4 +22,4 @@ const commentSchema = new mongoose.Schema({
 //adding this as a plugins  : This insure how many items to show on a single page
 commentSchema.plugin(mongooseAggregatePaginate)
 
-export const Comment = mongoose.mode("Comment",commentSchema);
+export const Comment = mongoose.model("Comment",commentSchema);

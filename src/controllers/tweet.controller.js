@@ -1,6 +1,7 @@
 import mongoose, { isValidObjectId } from "mongoose"
 import {Tweet} from "../models/tweet.model.js"
 import {User} from "../models/user.model.js"
+import {Like} from "../models/like.model.js"
 import {ApiError} from "../utils/ApiErrorHandler.js"
 import {ApiResponse} from "../utils/ApiResponseHandler.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
@@ -36,8 +37,11 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
     const userId= req.user._id
 
-   // console.log("Req.user :::> ", req.user)
-    //console.log("UserId:: ",userId);
+
+    /*  This i need to check , if this is the right way or the aggregation 
+    Query the Tweet collection to find all tweets by the user
+    const userTweets = await Tweet.find({ owner: userId });
+      */
 
     const tweets = await User.aggregate([
         {
@@ -55,6 +59,53 @@ const getUserTweets = asyncHandler(async (req, res) => {
                 localField :"_id",
                 foreignField:"owner",
                 as :"Tweets" ,
+
+                pipeline:[
+                    //Adding the likedBy feild
+                    {
+                        $lookup:{
+                            from:"likes",
+                            localField:"_id",
+                            foreignField:"tweet",
+                            as:"likesList",
+                           /*  pipeline:[
+                                {
+                                 $lookup:{
+                                    from:"users",
+                                    localField:"likedBy",
+                                    foreignField:"_id",
+                                    as:"likesUserList"
+                                  }       
+                                }
+                            ] */
+                        }
+                    },
+                    {
+                        $addFields:{
+                            totalLikes:{
+                                $size:"$likesList"
+                            },
+                //This is i am not so sure of .!! 
+                            likedByCurrentUser:{
+                                $cond:{
+                                  if:{$in:[req.user?._id,"$likesList.likedBy"]},
+                                  then:true,
+                                  else:false
+                                }
+                              }
+                        }
+                    }
+                    ,
+               //Removing some feild
+                    {
+                        $project:{
+                            content:1 ,
+                            createdAt:1,
+                            totalLikes:1,
+                            likedByCurrentUser:1
+                        }
+                    }
+                ]
             }
         },
 
@@ -86,27 +137,33 @@ console.log("All tweets data",tweets)
     .json(new ApiResponse(200,tweets,"Tweets fetched SuccessFully"))
 })
 
+//Controller function to : Update a tweet 
 const updateTweet = asyncHandler(async (req, res) => {
     //TODO: update tweet
     const {newContent} = req.body ;
-    console.log(newContent)
-
+    
     if(!newContent)
     throw new ApiError(400,"Content can't be empty")
 
 
     //Note : Here in the routing , we should include the tweetId in the params 
-    const id=req.params ; //this is the problem , unable to get data from the params
+    const id=new mongoose.Types.ObjectId(req.params) ; 
     console.log("incoming Params" ,id);
 
-    const tweetId = new mongoose.Types.ObjectId(id) ;
-    
-   
-    console.log("TweetId:",tweetId);
-    //const tweetUp=await Tweet.findById('662e4649658d6b106edae8a6');
-    //console.log("tweet Found",tweetUp)
 
-    const tweet = await Tweet.findByIdAndUpdate
+    const tweet = await Tweet.findById(id)
+    
+    if (!tweet) {
+        throw new ApiError(404, "Tweet not found");
+    }
+
+    //checking if the Logged in user is the owner of the tweet 
+    if (tweet?.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(400, "Unauthorized..!! Only the owner of the Tweet can Update this Tweet ..!!");
+    }
+    
+
+/* const tweet = await Tweet.findByIdAndUpdate
     (
        tweetId,
         {
@@ -115,21 +172,33 @@ const updateTweet = asyncHandler(async (req, res) => {
             }
         },
         {new:true}
-    )
-    if(!tweet){
-        throw new ApiError(400,"The Tweet was not updated") ;
-    }
+    ) */
+
+   
+        tweet.content=newContent ;
+         await tweet.save({validateBeforeSave:false})
+
      return res.status(200)
      .json(new ApiResponse(200,tweet,"Tweet Updated SuccessFully"))
 
 })
 
+//Controller function to : To delete a tweet 
 const deleteTweet = asyncHandler(async (req, res) => {
     //TODO: delete tweet
-    const id= req.params ;
-    const tweetId = new mongoose.Types.ObjectId(id) ;
+   
+    const id = new mongoose.Types.ObjectId(req.params) ;
 
-    const deletedTweet = await Tweet.findOneAndDelete(tweetId);
+    const tweet = await Tweet.findById(id)
+    
+    if (!tweet) {
+        throw new ApiError(404, "Tweet not found");
+    }
+ //checking if the Logged in user is the owner of the tweet 
+    if (tweet?.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(400, "Unauthorized..!! Only the owner of the Tweet can Update this Tweet ..!!");
+    }
+    const deletedTweet = await Tweet.deleteOne({_id:id});
 
     if(!deletedTweet){
         throw new ApiError(400,"Error While deleting the tweet , OR ALready Deleted ")

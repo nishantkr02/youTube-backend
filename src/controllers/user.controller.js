@@ -67,8 +67,9 @@ const registerUser =  asyncHandler(async (req,res)=>{
      
       //avatar is a required Feild
       console.log("Avtar ka data :" ,avatarLocalPath);
+      
       if(!avatarLocalPath)
-      throw new ApiError(404,' local patha aa raha ahi ki nai be ,, Avatar Files is required');
+      throw new ApiError(404,' Avatar Files is required');
 
 // Step 5  :   Uploading on cloudinary : We have already written a Util for this     in  cloudinaryFileUpload.js
     const coverImage= await uploadOnCloudinary(coverLocalPath) ;
@@ -96,7 +97,7 @@ const registerUser =  asyncHandler(async (req,res)=>{
   const createdUser=  await User.findById(user._id).select("-password -refreshToken ")
 
    if(!createdUser){
-    throw new ApiError(500,"Something went wrong while registring the user ")
+    throw new ApiError(500,"Something went wrong while registering the user ")
     }
 
 //Step 9 : Sending the Api response :: using the util ApiResonse(statusCode,data,message="Sucess")
@@ -503,10 +504,10 @@ const getWatchHistory= asyncHandler(async(req,res)=>{
                       foreignField:"_id",
                       as:"owner",
 
-                      // Filtering out the information to store in  the owner , we don't need them all 
+                // Filtering out the owner information to store in  the owner , we don't need them all 
                       pipeline:[
                         {
-                          project :{
+                          $project :{
                             fullName:1,
                             username :1,
                             avatar:1 ,

@@ -55,11 +55,13 @@ app.use("/api/v1/tweets",tweetRouter)
  import commentRouter from "./routes/comment.routes.js";
  app.use("/api/v1/comments",commentRouter)
 
+// Video Route 
+ import videoRouter from "./routes/video.routes.js";
+app.use("/api/v1/videos",videoRouter)
 
 
-
-
-
-
+//Subscription Route 
+import subscriptionRouter from "./routes/subscription.routes.js";
+app.use("/api/v1/subscription",subscriptionRouter)
 
 export {app}

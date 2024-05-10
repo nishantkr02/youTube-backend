@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {verifyJwt} from "../middlewares/auth.middleware"
+import {verifyJWT} from "../middlewares/auth.middleware.js"
 import { getVideoComments ,
         addComment,
         updateComment,
@@ -9,15 +9,15 @@ import { getVideoComments ,
 const commentRouter = Router();
 
  // Getting all the comments on a  video 
- commentRouter.route("/all-comments").get(getVideoComments)
+ commentRouter.route("/all-comments/:videoId").get(getVideoComments)
 
  //Adding a new Comment 
- commentRouter.route("/add-comment").post(verifyJwt,addComment)
+ commentRouter.route("/add-comment/:videoId").post(verifyJWT,addComment)
 
  //Updating a comment
- commentRouter.route("/update-comment/:id").patch(verifyJwt,updateComment) 
+ commentRouter.route("/update-comment/:commentId").patch(verifyJWT,updateComment) 
 
  //Deleting a comment
- commentRouter.route("/delete-comment/:id").delete(verifyJwt,deleteComment)
+ commentRouter.route("/delete-comment/:commentId").delete(verifyJWT,deleteComment)
 
 export default commentRouter 

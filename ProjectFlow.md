@@ -245,3 +245,58 @@ In real life , A refresh token just helps you re-validate a user without them ha
 
 => Channel search se => Number of Subscriber for that channel  
 => Subsciber search se  => Number of channel , to which that user has subscribed .
+
+
+
+## Response from cloudinary after video file uplo
+
+>Video File Details  {
+  asset_id: '1be0586dc98f0d2309c0a227504b629a',
+  public_id: 'xk6j64urca9kpiytre2y',
+  version: 1714800725,
+  version_id: '7783d7d379db7835c0d5aa63a89991f4',       
+  signature: '069153578754010cfc48cfc0b39c52e74b0f382a',
+  width: 1280,
+  height: 720,
+  format: 'mp4',
+  resource_type: 'video',
+  created_at: '2024-05-04T05:32:05Z',
+  tags: [],
+  pages: 0,
+  bytes: 1754229,
+  type: 'upload',
+  etag: '136859765322813f052e3d1cdf346dd2',
+  placeholder: false,
+  url: 'http://res.cloudinary.com/yourtube-backend/video/upload/v1714800725/xk6j64urca9kpiytre2y.mp4',
+  secure_url: 'https://res.cloudinary.com/yourtube-backend/video/upload/v1714800725/xk6j64urca9kpiytre2y.mp4',
+  playback_url: 'https://res.cloudinary.com/yourtube-backend/video/upload/sp_auto/v1714800725/xk6j64urca9kpiytre2y.m3u8',
+  folder: '',
+  audio: {
+    codec: 'aac',
+    bit_rate: '173712',
+    frequency: 48000,
+    channels: 2,
+    channel_layout: 'stereo'
+  },
+  video: {
+    pix_format: 'yuvj420p',
+    codec: 'h264',
+    level: 31,
+    profile: 'Main',
+    bit_rate: '5380999',
+    dar: '16:9',
+    time_base: '1/30000'
+  },
+  is_audio: false,
+  frame_rate: 14.833333333333334,
+  bit_rate: 5540399,
+  duration: 2.529367,
+  rotation: 0,
+  original_filename: 'WIN_20220410_15_27_10_Pro',
+  nb_frames: 38,
+  api_key: '379259554124669'
+}
+
+>> The findOne() method can be used with more than one condition
+
+>> For any file upload , add multer middleware in the route

@@ -40,8 +40,7 @@ empty and all , user already exist or not : By using  email and username , files
 
 
 
- ## using the PostMan for backEnd  :;:::
-  >> Body Tag >>  select form-data >> add key value pairs 
+ ## using the PostMan for backEnd  :;:::>> Body Tag >>  select form-data >> add key value pairs 
 
   >> Posatman  response : ::::::::::::::::
   {
@@ -90,15 +89,15 @@ empty and all , user already exist or not : By using  email and username , files
 
 >> Now let's see the , req.body ,req.files and response from the cloudinary  after uplaoding the files  :::
 
- ## req.body ::::::::::::::::::::::::::::::
- The Sent Data by the User  : [Object: null prototype] {
+ ## req.body ::::::::::::::::::::::::::::::The Sent Data by the User  : [Object: null prototype] {
+
   fullName: 'Nishant Kumar',
   email: 'nick3@gmail.com',
   username: 'Nishant',
   password: 'hitherewhy'
 }
- ## response from the clodinary ::::::::::::
-   >const coverImage= await uploadOnCloudinary(coverLocalPath) ;
+
+ ## response from the clodinary ::::::::::::>const coverImage= await uploadOnCloudinary(coverLocalPath) ;
    >console.log(coverImage);
 
  The response From Cloudinary Aster Uploading  ::
@@ -125,8 +124,7 @@ empty and all , user already exist or not : By using  email and username , files
   api_key: '379259554124669'
 }
 
-## The response From Cloudinary Aster Uploading  :: 
- >const avatar = await uploadOnCloudinary(avatarLocalPath) ;
+## The response From Cloudinary Aster Uploading  :: >const avatar = await uploadOnCloudinary(avatarLocalPath) ;
  >console.log(avtar)
 {
   asset_id: 'dea7484265809f75ead28b6a484e6edd',
@@ -153,8 +151,7 @@ empty and all , user already exist or not : By using  email and username , files
 
 
 
-## Data stored in req.fiels  ::::
-> console.log("Data Stores in Req.files  :: ",req.files) ;
+## Data stored in req.fiels  ::::> console.log("Data Stores in Req.files  :: ",req.files) ;
 
 Data Stores in Req.files  ::  [Object: null prototype] {
   avatar: [
@@ -250,7 +247,8 @@ In real life , A refresh token just helps you re-validate a user without them ha
 
 ## Response from cloudinary after video file uplo
 
->Video File Details  {
+>Video File Details  from cloudinary :
+ {
   asset_id: '1be0586dc98f0d2309c0a227504b629a',
   public_id: 'xk6j64urca9kpiytre2y',
   version: 1714800725,
@@ -297,6 +295,19 @@ In real life , A refresh token just helps you re-validate a user without them ha
   api_key: '379259554124669'
 }
 
+
+
+
+
+>>---------------------- ----------------------------------
+
+## Some Notes : 
+
 >> The findOne() method can be used with more than one condition
 
 >> For any file upload , add multer middleware in the route
+ 
+ >> While I was at Like Model : We have so many feilds there , but we don't have to populate all of them for every document .
+ > Soooo, it's not necessary to provide all fields while creating a document in MongoDB. MongoDB is not a relational database, so fields in one document in a collection don't need to match the fields in other documents in the same collection, and fields don't need to be present at all.
+
+ >> If we don include , verifyJWT middleware in the routes then the req.user wont get the details iof the user in it .

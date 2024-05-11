@@ -9,7 +9,7 @@ import { getVideoComments ,
 const commentRouter = Router();
 
  // Getting all the comments on a  video 
- commentRouter.route("/all-comments/:videoId").get(getVideoComments)
+ commentRouter.route("/all-comments/:videoId").get(verifyJWT,getVideoComments)
 
  //Adding a new Comment 
  commentRouter.route("/add-comment/:videoId").post(verifyJWT,addComment)

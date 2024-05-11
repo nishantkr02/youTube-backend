@@ -10,7 +10,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     //TODO: get all comments for a video
     const {videoId} = req.params
     const {page = 1, limit} = req.query
-
+    const userId = req.user?._id
     const commentList = await Video.aggregate ([
         {
             $match:{

@@ -25,6 +25,33 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 as:"uploadedVideos" ,
                 pipeline:[
                     //Add like and comment lookup to get like count and commnet count
+                   {
+                        $lookup:{
+                            from:"likes",
+                            localField:"_id",
+                            foreignField:"video",
+                             as:"videoLikes"
+                        }
+                   } ,
+                     {
+                        $lookup:{
+                            from:"comments",
+                            localField:"_id",
+                            foreignField:"video",
+                             as:"videoComments"
+                        }
+                   } ,
+                   {
+                    $addFields:{
+                        totalLikes:{
+                            $size:"$videoLikes"
+                        },
+                        totalComments:{
+                            $size:"$videoComments"
+                        }
+                    }
+                   } ,
+                    
                     {
                         $project:{
                             title:1,
@@ -33,7 +60,9 @@ const getAllVideos = asyncHandler(async (req, res) => {
                             thumbnail:1 ,
                             duration:1,
                             views:1,
-                            isPublished:1
+                            isPublished:1,
+                            totalLikes:1 ,
+                            totalComments:1
 
                         }
                     }

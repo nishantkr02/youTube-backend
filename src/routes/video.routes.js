@@ -32,7 +32,7 @@ videoRouter.route("/all-videos").get(verifyJWT,getAllVideos)
 
 //get Video by Id 
 videoRouter.route("/:videoId").get(verifyJWT,getVideoById)
-export default videoRouter ;
+
 
 // Update a video : title ,description and thumbnail
 videoRouter.route("/update-video/:videoId").patch(verifyJWT,upload.single("thumbnail"),updateVideo)
@@ -42,3 +42,5 @@ videoRouter.route("/update-video/:videoId").patch(verifyJWT,upload.single("thumb
 
  //Toggle publish status 
  videoRouter.route("/toggle-publish-status/:videoId").patch(verifyJWT,togglePublishStatus)
+
+ export default videoRouter ;

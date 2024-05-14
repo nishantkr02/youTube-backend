@@ -311,3 +311,48 @@ In real life , A refresh token just helps you re-validate a user without them ha
  > Soooo, it's not necessary to provide all fields while creating a document in MongoDB. MongoDB is not a relational database, so fields in one document in a collection don't need to match the fields in other documents in the same collection, and fields don't need to be present at all.
 
  >> If we don include , verifyJWT middleware in the routes then the req.user wont get the details iof the user in it .
+
+ >> #To use the $sort modifier, it must appear with the $each modifier. You can pass an empty array [] to the $each modifier such that only the $sort modifier has an effect.
+{
+  $push: {
+     <field>: {
+       $each: [ <value1>, <value2>, ... ],
+       $sort: <sort specification>
+     }
+  }
+}
+
+For <sort specification>:
+
+## To sort array elements that are not documents, or if the array elements are documents, to sort by the whole documents, specify 1 for ascending or -1 for descending.
+
+If the array elements are documents, to sort by a field in the documents, specify a sort document with the field and the direction, i.e. { field: 1 } or { field: -1 }
+> db.students.updateOne(
+   { _id: 1 },
+   {
+     $push: {
+       quizzes: {
+         $each: [ { id: 3, score: 8 }, { id: 4, score: 7 }, { id: 5, score: 6 } ],
+         $sort: { score: 1 }
+       }
+     }
+   }
+)
+
+>> To remove one or many entries from an array
+{
+      _id: 1,
+      fruits: [ "apples", "pears", "oranges", "grapes", "bananas" ],
+      vegetables: [ "carrots", "celery", "squash", "carrots" ]
+   }
+   ,
+   {
+      _id: 2,
+      fruits: [ "plums", "kiwis", "oranges", "bananas", "apples" ],
+      vegetables: [ "broccoli", "zucchini", "carrots", "onions" ]
+   }
+
+   ## db.stores.updateMany(
+    { },
+    { $pull: { fruits: { $in: [ "apples", "oranges" ] }, vegetables: "carrots" } }
+)

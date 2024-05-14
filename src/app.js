@@ -65,9 +65,14 @@ import subscriptionRouter from "./routes/subscription.routes.js";
 app.use("/api/v1/subscription",subscriptionRouter)
 
 //Like Routes
-
 import likeRouter from "./routes/like.routes.js";
 app.use("/api/v1/likes",likeRouter)
+
+
+//playlist Routes
+
+import playlistRouter from "./routes/playlist.routes.js";
+app.use("/api/v1/playlists",playlistRouter)
 
 
 export {app}

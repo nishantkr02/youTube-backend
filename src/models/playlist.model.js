@@ -6,8 +6,8 @@ const playlistSchema = new mongoose.Schema({
         type :String ,
         required :true ,
     },
-    decription :{
-        ype :String ,
+    description :{
+        type :String ,
         required :true 
     },
     videos :[

@@ -118,7 +118,7 @@ const addComment = asyncHandler(async (req, res) => {
     const userId = req.user?._id ;
     
     const id = req.params.videoId
-    console.log("Id passed :",id);
+    //console.log("Id passed :",id);
 
 
 

@@ -11,6 +11,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
   //  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
     //TODO: get all videos based on query, sort, pagination
     const userId = req.user?._id ;
+    console.log("userId from req.user ::",userId)
     const videos = await User.aggregate([
         {
             $match:{
@@ -23,6 +24,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 localField:"_id",
                 foreignField:"owner",
                 as:"uploadedVideos" ,
+
                 pipeline:[
                     //Add like and comment lookup to get like count and commnet count
                    {
@@ -33,6 +35,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
                              as:"videoLikes"
                         }
                    } ,
+                  
                      {
                         $lookup:{
                             from:"comments",
@@ -41,6 +44,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
                              as:"videoComments"
                         }
                    } ,
+
                    {
                     $addFields:{
                         totalLikes:{
@@ -51,7 +55,12 @@ const getAllVideos = asyncHandler(async (req, res) => {
                         }
                     }
                    } ,
-                    
+                   /*  This is spitting out total likes , but it also removes all the other data feild 
+                   {
+                    $group:{
+                        _id:null,Total_Channel_Like:{$sum:"$totalLikes"}
+                    }
+                }, */
                     {
                         $project:{
                             title:1,
@@ -62,13 +71,15 @@ const getAllVideos = asyncHandler(async (req, res) => {
                             views:1,
                             isPublished:1,
                             totalLikes:1 ,
-                            totalComments:1
+                            totalComments:1 ,
+                            Total_Channel_Like:1
 
                         }
                     }
                 ]
             }
         },
+        
         {
             $addFields:{
                 totalVideos :{
@@ -76,6 +87,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 }
             }
         },
+        
         {
             $project:{
                 username:1,
@@ -126,7 +138,7 @@ const video = await  Video.create({
     thumbnail:thumbnail.url,
     videoFile:videoFile.url,
     isPublished:true,
-    views:0,
+    views:1,
     duration:videoFile.duration,
     owner :req.user?._id
 

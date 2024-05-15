@@ -74,5 +74,11 @@ app.use("/api/v1/likes",likeRouter)
 import playlistRouter from "./routes/playlist.routes.js";
 app.use("/api/v1/playlists",playlistRouter)
 
+ 
+
+// Dashboard Router
+import dashboardRouter from "./routes/dashboard.routes.js";
+app.use("/api/v1/dashboard",dashboardRouter)
+
 
 export {app}

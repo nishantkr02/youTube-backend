@@ -1,9 +1,10 @@
 
 //taking a function and returaning a function as well 
-const asyncHandler = (requestHandler)=>{
-  
+const asyncHandler = (requestHandlerFunction)=>{
+  //requestHandlerFunction is expected to be a function that represents the actual logic 
+  I want to execute within your Express route handler
    return (req,res,next)=>{
-    Promise.resolve(requestHandler(req,res,next)).
+    Promise.resolve(requestHandlerFunction(req,res,next)).
     catch((err)=>next(err))
   }
 }
